@@ -77,4 +77,15 @@ describe('MemoryStorage', function(){
         })
     });
   });
+  describe('#noexist 2', function() {
+      var test = new MemoryStore();
+      test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
+        it("should be empty when not found", function (done) {
+          test.get({ first: "Anna", age: 21 }, function (v) {
+            assert.deepEqual(v, []);
+            done();
+          })
+        })
+    });
+  });
 });

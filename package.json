@@ -1,0 +1,23 @@
+{
+  "author": "Leander Lee",
+  "name": "memstorage",
+  "description": "Memory storage module, written in node.js",
+  "version": "0.1.0",
+  "homepage": "http://github.com/leanderlee/node-memstorage",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/leanderlee/node-memstorage.git"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "main": "index",
+  "dependencies": {
+    "mocha": "~1"
+   },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}

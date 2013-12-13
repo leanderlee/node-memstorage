@@ -1,4 +1,4 @@
-var MemoryStore = require("../lib/memstorage");
+var MemoryStore = require("../lib/memory");
 var assert = require("assert");
 
 describe('MemoryStorage', function(){

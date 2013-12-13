@@ -5,13 +5,13 @@ Really simple to use. Here is an example of how this store would work:
 
 ```js
 
-var MemoryStore = require("memstorage");
+var storage = require("memstorage");
 
 
 var key = { name: "Leander", age: 20 };
 var val = { picture: "http://example.com/picture.png", email: "leander@example.com" };
 
-var people = new MemoryStore();
+var people = storage();
 people.connect(function () {
 	people.set(key, val, function () {
 		people.get({ name: "Leander" }, function (v) {

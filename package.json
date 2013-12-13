@@ -2,7 +2,7 @@
   "author": "Leander Lee",
   "name": "memstorage",
   "description": "Memory storage module, written in node.js",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "homepage": "http://github.com/leanderlee/node-memstorage",
   "repository": {
     "type": "git",

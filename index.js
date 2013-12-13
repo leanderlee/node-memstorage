@@ -2,13 +2,14 @@
 var Store = function (options) {
 	options = options || {};
 	options.type = options.type || "memory";
-	options.settings = options.settings || {};	
+	options.settings = options.settings || {};
+
 	try {
-		return require("./lib/" + options.type)(options.settings);
+		var store = require("./lib/" + options.type);
 	} catch (e) {
-		console.log("Could not find the type you wanted.");
 		return null;
 	}
+	return new store(options.settings);
 }
 
 module.exports = Store;

@@ -1,5 +1,6 @@
 Memory Storage for NodeJS
 ===============
+![](https://travis-ci.org/leanderlee/node-memstorage.png?branch=master)
 
 This is a really simple library meant to abstract away how the data is physically stored from (JS) code.
 

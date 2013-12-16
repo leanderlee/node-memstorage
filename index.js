@@ -1,3 +1,4 @@
+var mongo = require("mongodb");
 
 var Store = function (options) {
 	options = options || {};

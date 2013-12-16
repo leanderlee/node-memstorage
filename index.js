@@ -6,7 +6,7 @@ var Store = function (options) {
 	options.settings = options.settings || {};
 
 	try {
-		var store = require("./lib/" + options.type);
+		var store = require("./lib/" + options.type.toLowerCase());
 	} catch (e) {
 		return null;
 	}

@@ -15,6 +15,19 @@ describe('MongoStorage', function(){
       });
     })
   });
+  describe('#empty', function() {
+    it("should be nothing", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
+          test.get({}, function (v) {
+            assert.deepEqual(v, []);
+            done();
+          })
+        })
+      })
+    })
+  });
   describe('#simple', function() {
     it("should set x", function (done) {
       var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });

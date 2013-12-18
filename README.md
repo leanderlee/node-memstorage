@@ -1,6 +1,7 @@
-Memory Storage for NodeJS
+Memory Storage for Node [![Build Status](https://travis-ci.org/leanderlee/node-memstorage.png?branch=master)](http://travis-ci.org/leanderlee/memstorage)  [![NPM version](https://badge.fury.io/js/memstorage.png)](http://badge.fury.io/js/memstorage)
 ===============
-![](https://travis-ci.org/leanderlee/node-memstorage.png?branch=master)
+
+[![NPM](https://nodei.co/npm/memstorage.png?downloads=true)](https://nodei.co/npm/memstorage/)
 
 This is a really simple library meant to abstract away how the data is physically stored from (JS) code.
 

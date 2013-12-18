@@ -61,9 +61,9 @@ describe('MemoryStorage', function(){
   describe('#nested', function() {
     var test = new MemoryStore();
     test.connect(function () {
-      test.set({ name: { first: "Anna", last: "Apple" }, hair: "red" }, { email: "anna@apple.com" }, function() {
-        test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green" }, { email: "ben@banana.com" }, function() {
-          test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green" }, { email: "arthur@apple.com" }, function() {
+      test.set({ name: { first: "Anna", last: "Apple" }, hair: "red", awesome: true }, { email: "anna@apple.com" }, function() {
+        test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green", awesome: true }, { email: "ben@banana.com" }, function() {
+          test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green", awesome: false }, { email: "arthur@apple.com" }, function() {
             it("should get both with same last name", function (done) {
               test.get({ name: { last: "Apple" } }, function (v) {
                 assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "arthur@apple.com" }]);
@@ -73,6 +73,24 @@ describe('MemoryStorage', function(){
             it("should get Apple with green hair", function (done) {
               test.get({ name: { last: "Apple" }, hair: "green" }, function (v) {
                 assert.deepEqual(v, [{ email: "arthur@apple.com" }]);
+                done();
+              });
+            })
+            it("should get even in a different order", function (done) {
+              test.get({ hair: "green", name: { last: "Apple" } }, function (v) {
+                assert.deepEqual(v, [{ email: "arthur@apple.com" }]);
+                done();
+              });
+            })
+            it("should get boolean", function (done) {
+              test.get({ awesome: true }, function (v) {
+                assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "ben@banana.com" }]);
+                done();
+              });
+            })
+            it("should get ordered boolean", function (done) {
+              test.get({ awesome: true, hair: "green" }, function (v) {
+                assert.deepEqual(v, [{ email: "ben@banana.com" }]);
                 done();
               });
             })
@@ -108,6 +126,28 @@ describe('MemoryStorage', function(){
           test.get({ first: "Anna", age: 21 }, function (v) {
             assert.deepEqual(v, []);
             done();
+          })
+        })
+      })
+    });
+  });
+  describe('#del', function() {
+    var test = new MemoryStore();
+    test.connect(function () {
+      test.set({ first: "Anna", age: 20 }, { email: "anna@domain.com" }, function() {
+        test.set({ first: "Ben", age: 20 }, { email: "ben@domain.com" }, function() {
+          test.set({ first: "Carl", age: 21 }, { email: "ben@domain.com" }, function() {
+            it("should delete all indices", function (done) {
+              test.get({ age: 20 }, function (v) {
+                assert.deepEqual(v, [{ email: "anna@domain.com" }, { email: "ben@domain.com" }]);
+                test.del({ first: "Anna" }, function () {
+                  test.get({ age: 20 }, function (v) {
+                    assert.deepEqual(v, [{ email: "ben@domain.com" }]);
+                    done();
+                  })
+                })
+              })
+            })
           })
         })
       })

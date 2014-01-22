@@ -50,7 +50,7 @@ describe('MongoStorage', function(){
         test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
           test.set({ first: "Samantha", age: 20 }, { email: "arthur@apple.com" }, function() {
             test.get({ age: 20 }, function (v) {
-              assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "arthur@apple.com" }]);
+              assert.deepEqual(v, [{ email: "arthur@apple.com" }, { email: "anna@apple.com" }]);
               done();
             })
           })
@@ -59,18 +59,27 @@ describe('MongoStorage', function(){
     });
   });
   describe('#nested', function() {
-    var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
-    test.connect(function () {
-      test.set({ name: { first: "Anna", last: "Apple" }, hair: "red" }, { email: "anna@apple.com" }, function() {
-        test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green" }, { email: "ben@banana.com" }, function() {
-          test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green" }, { email: "arthur@apple.com" }, function() {
-            it("should get both with same last name", function (done) {
+    it("should get both with same last name", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ name: { first: "Anna", last: "Apple" }, hair: "red" }, { email: "anna@apple.com" }, function() {
+          test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green" }, { email: "ben@banana.com" }, function() {
+            test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green" }, { email: "arthur@apple.com" }, function() {
               test.get({ name: { last: "Apple" } }, function (v) {
                 assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "arthur@apple.com" }]);
                 done();
               })
             })
-            it("should get Apple with green hair", function (done) {
+          })
+        })
+      });
+    });
+    it("should get Apple with green hair", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ name: { first: "Anna", last: "Apple" }, hair: "red" }, { email: "anna@apple.com" }, function() {
+          test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green" }, { email: "ben@banana.com" }, function() {
+            test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green" }, { email: "arthur@apple.com" }, function() {
               test.get({ name: { last: "Apple" }, hair: "green" }, function (v) {
                 assert.deepEqual(v, [{ email: "arthur@apple.com" }]);
                 done();
@@ -82,16 +91,21 @@ describe('MongoStorage', function(){
     });
   });
   describe('#noexist', function() {
-    var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
-    test.connect(function () {
-      test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
-        it("should be empty when not found", function (done) {
+    it("should be empty when not found", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
           test.get({ first: "Tom" }, function (v) {
             assert.deepEqual(v, []);
             done();
           })
         })
-        it("should be empty when no query", function (done) {
+      })
+    })
+    it("should be empty when no query", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
           test.get({}, function (v) {
             assert.deepEqual(v, []);
             done();
@@ -101,13 +115,28 @@ describe('MongoStorage', function(){
     });
   });
   describe('#noexist 2', function() {
-    var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
-    test.connect(function () {
-      test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
-        it("should be empty when not found", function (done) {
+    it("should be empty when not found", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
           test.get({ first: "Anna", age: 21 }, function (v) {
             assert.deepEqual(v, []);
             done();
+          });
+        });
+      });
+    });
+  });
+  describe('#id overwrite', function() {
+    it("should be working", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test-id" });
+      test.connect(function () {
+        test.del({ first: "Anna" }, function() {
+          test.set({ first: "Anna", age: 20 }, { _id: "abc", email: "anna@apple.com" }, function() {
+            test.get({ first: "Anna" }, function (v) {
+              assert.deepEqual(v, [{ _id: "abc", email: "anna@apple.com" }]);
+              done();
+            });
           });
         });
       });

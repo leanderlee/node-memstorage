@@ -47,11 +47,16 @@ describe('MongoStorage', function(){
     it("should set x", function (done) {
       var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
       test.connect(function () {
-        test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
-          test.set({ first: "Samantha", age: 20 }, { email: "arthur@apple.com" }, function() {
-            test.get({ age: 20 }, function (v) {
-              assert.deepEqual(v, [{ email: "arthur@apple.com" }, { email: "anna@apple.com" }]);
-              done();
+        test.del({ age: 20 }, function() {
+          test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
+            test.set({ first: "Samantha", age: 20 }, { email: "arthur@apple.com" }, function() {
+              test.get({ first: "Anna", age: 20 }, function (v) {
+                assert.deepEqual(v, [{ email: "anna@apple.com" }]);
+                test.get({ first: "Samantha", age: 20 }, function (v) {
+                  assert.deepEqual(v, [{ email: "arthur@apple.com" }]);
+                  done();
+                })
+              })
             })
           })
         })

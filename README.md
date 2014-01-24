@@ -7,75 +7,71 @@ This is a really simple library meant to abstract away how the data is physicall
 
 It's great for clusters, scalable web processes, and any application code that may get restarted frequently but still need to connect to some sort of persistent storage.
 
+## Using the store
+
+```js
+var passport = { id: "abcdef" };
+var passports = new Store();
+passports.connect(function () {
+  passports.set({ name: "Leander", age: 20 }, passport, function () {
+    passports.get({ name: "Leander" }, function (v) {
+      // v == passport
+      passports.del({ age: 20 }, function () {
+      	// All passports for people age 20 deleted.
+      });
+    });
+  })
+});
+```
+
 ## Getting Started
 
 To start using this module, simply do `npm install memstorage`.
 
 ```js
 var Store = require("memstorage");
-var store = Store(opts);
+var store = Store({ type: "memory" });
 ```
 
-`opts` determine what kind of underlying storage engine to use.
-
-### Using RAM as storage (Default)
+### Types of stores:
 ```js
-opts = {
-	type: "memory"
-}
+var mongo = Store({
+  type: "mongo",
+  settings: {
+    host: "localhost",
+    port: 27017,
+    user: "someuser",
+    pass: "somepass",
+    db: "somedb",
+    collectionName: "somecollection"
+  }
+});
+var multi = Store({
+  type: "multi",
+  settings: {
+    store: [
+      { type: "memory" },
+      {
+      	type: "mongo",
+      	settings: {
+          host: "localhost",
+          port: 27017,
+          user: "someuser",
+          pass: "somepass",
+          db: "somedb",
+          collectionName: "somecollection"
+        }
+      }
+    ]
+});
 ```
 
-### Using Mongo as storage
-```js
-opts = {
-	type: "mongo",
-	settings: {
-		host: "localhost",
-		port: 27017,
-		user: "someuser",
-		pass: "somepass",
-		db: "somedb",
-		collectionName: "somecollection"
-	}
-}
-```
+More advanced usage can be found in the [tests](https://github.com/leanderlee/node-memstorage/tree/master/test)!
 
 
-## Inserting into the Store
+## Extending memstorage
 
-```js
-store.connect(function () {
-	store.set({ name: "Leander", age: 20 }, data, function () {
-		
-	})
-})
-
-```
-
-## Fetching from the Store
-
-```js
-store.connect(function () {
-	store.get({ name: "Leander" }, function (v) {
-		// v == data
-	})
-})
-```
-
-## Deleting from the Store
-
-```js
-store.connect(function () {
-	store.del({ name: "Leander" }, function () {
-
-	})
-})
-```
-
-
-That's it!
-
-Additional connection types, such as Redis, etc. can be abstracted from this later using the following 4 functions:
+Make your own stores by implementing these four functions:
 
 - `connect(cb(success))` - Connects to the underlying memory storage engine and calls `cb` with whether it worked or failed.
 - `set(key, val, cb)` - Sets the key to the given value and calls `cb` when done.

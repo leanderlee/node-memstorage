@@ -4,7 +4,6 @@ var Store = function (options) {
 	options = options || {};
 	options.type = options.type || "memory";
 	options.settings = options.settings || {};
-
 	try {
 		var store = require("./lib/" + options.type.toLowerCase());
 	} catch (e) {

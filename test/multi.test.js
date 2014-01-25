@@ -76,4 +76,17 @@ describe('MultiStorage', function(){
       });
     })
   });
+  describe('#call cb once only', function() {
+    it("should fetch from the first", function (done) {
+      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-1" } };
+      var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-2" } };
+      var test = new MultiStore({ stores: [settings1, settings2] });
+      var c = 0;
+      test.connect(function () {
+        if (c) throw new Exception("Called twice.");
+        c = 1;
+        done();
+      });
+    })
+  });
 });

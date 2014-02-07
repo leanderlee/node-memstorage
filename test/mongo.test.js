@@ -32,10 +32,10 @@ describe('MongoStorage', function(){
     it("should set x", function (done) {
       var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
       test.connect(function () {
-        test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
-          test.set({ first: "Samantha", last: "Apple" }, { email: "arthur@apple.com" }, function() {
+        test.set({ first: "Anna", last: "Apple" }, { email: "simple@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "simple@apple.com" }, function() {
             test.get({ last: "Apple" }, function (v) {
-              assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "arthur@apple.com" }]);
+              assert.deepEqual(v, [{ email: "simple@apple.com" }, { email: "simple@apple.com" }]);
               done();
             })
           })
@@ -146,5 +146,52 @@ describe('MongoStorage', function(){
         });
       });
     });
+  });
+  describe('#delete', function() {
+    it("should delete properly", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "samantha@apple.com" }, function() {
+            test.del({ first: "Anna" }, function() {
+              test.get({ last: "Apple" }, function (v) {
+                assert.deepEqual(v, [{ email: "samantha@apple.com" }]);
+                done();
+              })
+            })
+          })
+        })
+      });
+    })
+    it("should delete multiple", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "samantha@apple.com" }, function() {
+            test.del({ last: "Apple" }, function() {
+              test.get({ last: "Apple" }, function (v) {
+                assert.deepEqual(v, []);
+                done();
+              })
+            })
+          })
+        })
+      });
+    });
+    it("should delete none if no filter", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
+      test.connect(function () {
+        test.set({ first: "Anna", last: "Apple" }, { email: "user@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "user@apple.com" }, function() {
+            test.del({}, function() {
+              test.get({ last: "Apple" }, function (v) {
+                assert.deepEqual(v, [{ email: "user@apple.com" }, { email: "user@apple.com" }]);
+                done();
+              })
+            })
+          })
+        })
+      });
+    })
   });
 });

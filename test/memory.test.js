@@ -174,4 +174,21 @@ describe('MemoryStorage', function(){
       })
     });
   });
+  describe('#del nonexist', function() {
+    var test = new MemoryStore();
+    test.connect(function () {
+      test.set({ kind: "person", first: "Anna", age: 20 }, { email: "anna@domain.com" }, function() {
+        test.set({ kind: "person", first: "Ben", age: 20 }, { email: "ben@domain.com" }, function() {
+          it("should delete none", function (done) {
+            test.del({ foo: 20 }, function () {
+              test.get({ kind: "person" }, function (v) {
+                assert.deepEqual(v, [{ email: "anna@domain.com" }, { email: "ben@domain.com" }]);
+                done();
+              })
+            })
+          })
+        })
+      })
+    });
+  });
 });

@@ -153,4 +153,25 @@ describe('MemoryStorage', function(){
       })
     });
   });
+  describe('#del advanced 1', function() {
+    var test = new MemoryStore();
+    test.connect(function () {
+      test.set({ kind: "person", first: "Anna", age: 20 }, { email: "anna@domain.com" }, function() {
+        test.set({ kind: "person", first: "Ben", age: 20 }, { email: "ben@domain.com" }, function() {
+          test.set({ kind: "person", first: "Carl", age: 21 }, { email: "carl@domain.com" }, function() {
+            test.set({ kind: "person", first: "Dan" }, { email: "dan@domain.com" }, function() {
+              it("should delete 2", function (done) {
+                test.del({ age: 20 }, function () {
+                  test.get({ kind: "person" }, function (v) {
+                    assert.deepEqual(v, [{ email: "carl@domain.com" }, { email: "dan@domain.com" }]);
+                    done();
+                  })
+                })
+              })
+            })
+          })
+        })
+      })
+    });
+  });
 });

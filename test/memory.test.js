@@ -228,6 +228,21 @@ describe('MemoryStorage', function(){
       })
     });
   });
+  describe('#multiset', function() {
+    var test = new MemoryStore();
+    it("should only set once", function (done) {
+      test.connect(function () {
+        test.set({ venue: "venue1", origin: "test", destination: "test" }, { foo: "bar1" }, function() {
+          test.set({ venue: "venue1", origin: "test", destination: "test" }, { foo: "bar2" }, function() {
+            test.get({ venue: "venue1", origin: "test", destination: "test" }, function(v) {
+              assert.deepEqual(v.length == 1, true);
+              done();
+            })
+          })
+        })
+      })
+    });
+  });
   describe('#del nonexist', function() {
     var test = new MemoryStore();
     it("should delete none", function (done) {

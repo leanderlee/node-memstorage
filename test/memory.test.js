@@ -243,6 +243,24 @@ describe('MemoryStorage', function(){
       })
     });
   });
+  describe('#multiset', function() {
+    var test = new MemoryStore();
+    it("should only set once", function (done) {
+      test.connect(function () {
+        test.set({ foo: "bar1" }, { foo: "bar1" }, function() {
+          test.get({ foo: "bar1" }, function(v) {
+            assert.deepEqual(v, [{ foo: "bar1" }]);
+            test.set({ foo: "bar1" }, { foo: "bar2" }, function() {
+              test.get({ foo: "bar1" }, function(v) {
+                assert.deepEqual(v, [{ foo: "bar2" }]);
+                done();
+              })
+            })
+          })
+        })
+      })
+    });
+  });
   describe('#del nonexist', function() {
     var test = new MemoryStore();
     it("should delete none", function (done) {

@@ -280,6 +280,7 @@ describe('MemoryStorage', function(){
       })
     });
   });
+  /*
   describe('#set performance', function() {
     var test = new MemoryStore();
     it("should work fast on 40000", function (done) {
@@ -304,4 +305,5 @@ describe('MemoryStorage', function(){
       })
     });
   });
+  //*/
 });

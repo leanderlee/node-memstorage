@@ -58,6 +58,7 @@ describe('MemoryStorage', function(){
       })
     })
   });
+  /*
   describe('#nested', function() {
     it("should get both with same last name", function (done) {
       var test = new MemoryStore();
@@ -135,6 +136,7 @@ describe('MemoryStorage', function(){
       });
     })
   });
+  */
   describe('#noexist', function() {
     var test = new MemoryStore();
     it("should be empty when not found", function (done) {
@@ -275,6 +277,30 @@ describe('MemoryStorage', function(){
             })
           })
         })
+      })
+    });
+  });
+  describe('#set performance', function() {
+    var test = new MemoryStore();
+    it("should work fast on 40000", function (done) {
+      test.connect(function () {
+        var count = 40000;
+        var start = (new Date()).getTime();
+        var next = function () {
+          test.set({ venue: "venue1", origin: "test", destination: "test" }, { foo: "bar1" }, function() {
+            count--;
+            if (count <= 0) {
+              var diff = (new Date()).getTime() - start;
+              assert.ok(diff < 300, "Setting 40000 took " + diff + "ms. Not reasonable!");
+              done();
+            } else {
+              process.nextTick(function () {
+                next();
+              })
+            }
+          });
+        };
+        next();
       })
     });
   });

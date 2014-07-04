@@ -8,8 +8,8 @@ describe('MultiStorage', function(){
       var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-1" } };
       var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-2" } };
       var test = new MultiStore({ stores: [settings1, settings2] });
-      var db1 = new MongoStore(settings1.settings);
-      var db2 = new MongoStore(settings2.settings);
+      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-1" });
+      var db2 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-2" });
       test.connect(function () {
         db1.connect(function () {
           db2.connect(function () {
@@ -32,8 +32,8 @@ describe('MultiStorage', function(){
       var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-1" } };
       var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-2" } };
       var test = new MultiStore({ stores: [settings1, settings2] });
-      var db1 = new MongoStore(settings1.settings);
-      var db2 = new MongoStore(settings2.settings);
+      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-1" });
+      var db2 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-2" });
       test.connect(function () {
         db1.connect(function () {
           db2.connect(function () {
@@ -71,6 +71,25 @@ describe('MultiStorage', function(){
                 })
               })
             });
+          });
+        });
+      });
+    })
+    it("should fallback if miss", function (done) {
+      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-1" } };
+      var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-2" } };
+      var test = new MultiStore({ stores: [settings1, settings2] });
+      var db1 = new MongoStore(settings1.settings);
+      var db2 = new MongoStore(settings2.settings);
+      test.connect(function () {
+        db1.connect(function () {
+          db2.connect(function () {
+            db2.set("y", 24, function() {
+              test.get("y", function(v) {
+                assert.deepEqual(v, [24]);
+                done();
+              })
+            })
           });
         });
       });

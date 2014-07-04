@@ -139,6 +139,17 @@ describe('MemoryStorage', function(){
   */
   describe('#noexist', function() {
     var test = new MemoryStore();
+    it("should be null on cache miss", function (done) {
+      var nullTest = new MemoryStore({ nullOnMiss: true });
+      nullTest.connect(function () {
+        nullTest.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
+          nullTest.get({ first: "Tom" }, function (v) {
+            assert.equal(v, null);
+            done();
+          })
+        })
+      })
+    });
     it("should be empty when not found", function (done) {
       test.connect(function () {
         test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {

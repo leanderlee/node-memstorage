@@ -96,6 +96,17 @@ describe('MongoStorage', function(){
     });
   });
   describe('#noexist', function() {
+    it("should be null when nullOnMiss", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test", nullOnMiss: true });
+      test.connect(function () {
+        test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
+          test.get({ first: "Tom" }, function (v) {
+            assert.deepEqual(v, null);
+            done();
+          })
+        })
+      })
+    })
     it("should be empty when not found", function (done) {
       var test = new MongoStore({ db: "testing", collectionName: "mocha-test" });
       test.connect(function () {

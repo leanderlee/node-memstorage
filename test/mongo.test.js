@@ -42,6 +42,22 @@ describe('MongoStorage', function(){
         })
       });
     })
+    it("should include key", function (done) {
+      var test = new MongoStore({ db: "testing", collectionName: "mocha-test", includeKey: true });
+      test.connect(function () {
+        test.set({ first: "Anna", last: "Apple" }, { email: "simple@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "simple@apple.com" }, function() {
+            test.get({ last: "Apple" }, function (v) {
+              assert.deepEqual(v, [
+                { key: { first: "Anna", last: "Apple" }, val: { email: "simple@apple.com" } },
+                { key: { first: "Samantha", last: "Apple" }, val: { email: "simple@apple.com" } }
+              ]);
+              done();
+            })
+          })
+        })
+      });
+    })
   });
   describe('#number', function() {
     it("should set x", function (done) {

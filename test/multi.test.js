@@ -164,6 +164,33 @@ describe('MultiStorage', function(){
       });
     })
   });
+  describe('#should properly deal with partial cache', function() {
+    it("should miss on partial hits", function (done) {
+      var settings1 = { type: "memory" };
+      var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-1" } };
+      var test = new MultiStore({ cacheOnMiss: true, stores: [settings1, settings2] });
+      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-1" });
+      test.connect(function () {
+        db1.connect(function () {
+          test.del({ type: "z" }, function() {
+            db1.del({ type: "z" }, function() {
+              db1.set({ type: "z", age: 24 }, { name: "Leander" }, function() {
+                db1.set({ type: "z", age: 21 }, { name: "Samantha" }, function() {
+                  test.get({ type: "z", age: 24 }, function(v) {
+                    assert.deepEqual(v, [{ name: "Leander" }]);
+                    test.get({ type: "z" }, function(v) {
+                      assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
+                      done();
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    })
+  });
   describe('#call cb once only', function() {
     it("should fetch from the first", function (done) {
       var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-1" } };

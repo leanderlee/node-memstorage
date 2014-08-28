@@ -74,85 +74,75 @@ describe('MemoryStorage', function(){
       })
     })
   });
-  /*
-  describe('#nested', function() {
-    it("should get both with same last name", function (done) {
-      var test = new MemoryStore();
+  describe('#no permute', function() {
+    it("should not find partial match", function (done) {
+      var test = new MemoryStore({ permute: false });
       test.connect(function () {
-        test.set({ name: { first: "Anna", last: "Apple" }, hair: "red", awesome: true }, { email: "anna@apple.com" }, function() {
-          test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green", awesome: true }, { email: "ben@banana.com" }, function() {
-            test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green", awesome: false }, { email: "arthur@apple.com" }, function() {
-              test.get({ name: { last: "Apple" } }, function (v) {
-                assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "arthur@apple.com" }]);
-                done();
-              })
+        test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "arthur@apple.com" }, function() {
+            test.get({ last: "Apple" }, function (v) {
+              assert.deepEqual(v, []);
+              done();
             })
-          });
-        });
-      });
-    });
-    it("should get Apple with green hair", function (done) {
-      var test = new MemoryStore();
-      test.connect(function () {
-        test.set({ name: { first: "Anna", last: "Apple" }, hair: "red", awesome: true }, { email: "anna@apple.com" }, function() {
-          test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green", awesome: true }, { email: "ben@banana.com" }, function() {
-            test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green", awesome: false }, { email: "arthur@apple.com" }, function() {
-              test.get({ name: { last: "Apple" }, hair: "green" }, function (v) {
-                assert.deepEqual(v, [{ email: "arthur@apple.com" }]);
-                done();
-              });
-            });
-          });
-        });
-      });
+          })
+        })
+      })
     })
-    it("should get even in a different order", function (done) {
-      var test = new MemoryStore();
+    it("should not find partial even if include key is true", function (done) {
+      var test = new MemoryStore({ includeKey: true, permute: false });
       test.connect(function () {
-        test.set({ name: { first: "Anna", last: "Apple" }, hair: "red", awesome: true }, { email: "anna@apple.com" }, function() {
-          test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green", awesome: true }, { email: "ben@banana.com" }, function() {
-            test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green", awesome: false }, { email: "arthur@apple.com" }, function() {
-              test.get({ hair: "green", name: { last: "Apple" } }, function (v) {
-                assert.deepEqual(v, [{ email: "arthur@apple.com" }]);
-                done();
-              });
-            });
-          });
-        });
-      });
+        test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "arthur@apple.com" }, function() {
+            test.get({ last: "Apple" }, function (v) {
+              assert.deepEqual(v, []);
+              done();
+            })
+          })
+        })
+      })
     })
-    it("should get boolean", function (done) {
-      var test = new MemoryStore();
+    it("should find an exact match", function (done) {
+      var test = new MemoryStore({ permute: false });
       test.connect(function () {
-        test.set({ name: { first: "Anna", last: "Apple" }, hair: "red", awesome: true }, { email: "anna@apple.com" }, function() {
-          test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green", awesome: true }, { email: "ben@banana.com" }, function() {
-            test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green", awesome: false }, { email: "arthur@apple.com" }, function() {
-              test.get({ awesome: true }, function (v) {
-                assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "ben@banana.com" }]);
-                done();
-              });
-            });
-          });
-        });
-      });
+        test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "arthur@apple.com" }, function() {
+            test.get({ first: "Samantha", last: "Apple" }, function (v) {
+              assert.deepEqual(v, [{ email: "arthur@apple.com" }]);
+              done();
+            })
+          })
+        })
+      })
     })
-    it("should get ordered boolean", function (done) {
-      var test = new MemoryStore();
+    it("should find an exact match with include key", function (done) {
+      var test = new MemoryStore({ includeKey: true, permute: false });
       test.connect(function () {
-        test.set({ name: { first: "Anna", last: "Apple" }, hair: "red", awesome: true }, { email: "anna@apple.com" }, function() {
-          test.set({ name: { first: "Benjamin", last: "Banana" }, hair: "green", awesome: true }, { email: "ben@banana.com" }, function() {
-            test.set({ name: { first: "Arthur", last: "Apple" }, hair: "green", awesome: false }, { email: "arthur@apple.com" }, function() {
-              test.get({ awesome: true, hair: "green" }, function (v) {
-                assert.deepEqual(v, [{ email: "ben@banana.com" }]);
-                done();
-              });
-            });
-          });
-        });
-      });
+        test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
+          test.set({ first: "Samantha", last: "Apple" }, { email: "arthur@apple.com" }, function() {
+            test.get({ first: "Samantha", last: "Apple" }, function (v) {
+              assert.deepEqual(v, [{ key: { first: "Samantha", last: "Apple" }, val: { email: "arthur@apple.com" } }]);
+              done();
+            })
+          })
+        })
+      })
     })
   });
-  */
+  describe('#number', function() {
+    it("should ", function (done) {
+      var test = new MemoryStore();
+      test.connect(function () {
+        test.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
+          test.set({ first: "Samantha", age: 20 }, { email: "arthur@apple.com" }, function() {
+            test.get({ age: 20 }, function (v) {
+              assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "arthur@apple.com" }]);
+              done();
+            })
+          })
+        })
+      })
+    })
+  });
   describe('#noexist', function() {
     var test = new MemoryStore();
     it("should be null on cache miss", function (done) {

@@ -176,11 +176,17 @@ describe('MultiStorage', function(){
             db1.del({ type: "z" }, function() {
               db1.set({ type: "z", age: 24 }, { name: "Leander" }, function() {
                 db1.set({ type: "z", age: 21 }, { name: "Samantha" }, function() {
+                  console.log("Should miss here");
                   test.get({ type: "z", age: 24 }, function(v) {
                     assert.deepEqual(v, [{ name: "Leander" }]);
+                    console.log("Should miss again here");
                     test.get({ type: "z" }, function(v) {
                       assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
-                      done();
+                      console.log("Should hit here");
+                      test.get({ type: "z" }, function(v) {
+                        assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
+                        done();
+                      });
                     });
                   });
                 });

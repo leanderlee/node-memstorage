@@ -116,15 +116,12 @@ describe('MultiStorage', function(){
             test.del("y", function() {
               db2.set("y", 24, function() {
                 db1.get("y", function(v) {
-                  assert.deepEqual(v, []);
+                  assert.strictEqual(v.length, 0);
                   test.get("y", function(v) {
                     assert.deepEqual(v, [24]);
-                    db1.get("y", function(v) {
+                    test.get("y", function(v) {
                       assert.deepEqual(v, [24]);
-                      test.get("y", function(v) {
-                        assert.deepEqual(v, [24]);
-                        done();
-                      });
+                      done();
                     });
                   });
                 });
@@ -150,10 +147,7 @@ describe('MultiStorage', function(){
                     assert.deepEqual(v, []);
                     test.get({ type: "z" }, function(v) {
                       assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
-                      db1.get({ type: "z" }, function(v) {
-                        assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
-                        done();
-                      });
+                      done();
                     });
                   });
                 });
@@ -176,13 +170,13 @@ describe('MultiStorage', function(){
             db1.del({ type: "z" }, function() {
               db1.set({ type: "z", age: 24 }, { name: "Leander" }, function() {
                 db1.set({ type: "z", age: 21 }, { name: "Samantha" }, function() {
-                  console.log("Should miss here");
+                  // Should miss here
                   test.get({ type: "z", age: 24 }, function(v) {
                     assert.deepEqual(v, [{ name: "Leander" }]);
-                    console.log("Should miss again here");
+                    // Should miss again here
                     test.get({ type: "z" }, function(v) {
                       assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
-                      console.log("Should hit here");
+                      // Should hit here
                       test.get({ type: "z" }, function(v) {
                         assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
                         done();

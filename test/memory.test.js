@@ -107,7 +107,7 @@ describe('MemoryStorage', function(){
         test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
           test.set({ first: "Samantha", last: "Apple" }, { email: "arthur@apple.com" }, function() {
             test.get({ first: "Samantha", last: "Apple" }, function (v) {
-              assert.deepEqual(v, [{ email: "arthur@apple.com" }]);
+              assert.deepEqual(v, { email: "arthur@apple.com" });
               done();
             })
           })
@@ -120,7 +120,7 @@ describe('MemoryStorage', function(){
         test.set({ first: "Anna", last: "Apple" }, { email: "anna@apple.com" }, function() {
           test.set({ first: "Samantha", last: "Apple" }, { email: "arthur@apple.com" }, function() {
             test.get({ first: "Samantha", last: "Apple" }, function (v) {
-              assert.deepEqual(v, [{ key: { first: "Samantha", last: "Apple" }, val: { email: "arthur@apple.com" } }]);
+              assert.deepEqual(v, { key: { first: "Samantha", last: "Apple" }, val: { email: "arthur@apple.com" } });
               done();
             })
           })

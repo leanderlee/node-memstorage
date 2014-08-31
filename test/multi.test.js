@@ -77,119 +77,6 @@ describe('MultiStorage', function(){
         });
       });
     })
-    it("should fallback if miss", function (done) {
-      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-1" } };
-      var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-2" } };
-      var test = new MultiStore({ cacheOnMiss: false, stores: [settings1, settings2] });
-      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-1" });
-      var db2 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-2" });
-      test.connect(function () {
-        db1.connect(function () {
-          db2.connect(function () {
-            test.del("y", function() {
-              db2.set("y", 24, function() {
-                db1.get("y", function(v) {
-                  assert.deepEqual(v, []);
-                  test.get("y", function(v) {
-                    assert.deepEqual(v, [24]);
-                    db1.get("y", function(v) {
-                      assert.deepEqual(v, []);
-                      done();
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    })
-    it("should cache on miss", function (done) {
-      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-1" } };
-      var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-2" } };
-      var test = new MultiStore({ cacheOnMiss: true, stores: [settings1, settings2] });
-      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-1" });
-      var db2 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-2" });
-      test.connect(function () {
-        db1.connect(function () {
-          db2.connect(function () {
-            test.del("y", function() {
-              db2.set("y", 24, function() {
-                db1.get("y", function(v) {
-                  assert.strictEqual(v.length, 0);
-                  test.get("y", function(v) {
-                    assert.deepEqual(v, [24]);
-                    test.get("y", function(v) {
-                      assert.deepEqual(v, [24]);
-                      done();
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    })
-    it("should insert all cache on miss", function (done) {
-      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-1" } };
-      var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-2" } };
-      var test = new MultiStore({ cacheOnMiss: true, stores: [settings1, settings2] });
-      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-1" });
-      var db2 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-2" });
-      test.connect(function () {
-        db1.connect(function () {
-          db2.connect(function () {
-            test.del({ type: "z" }, function() {
-              db2.set({ type: "z", age: 24 }, { name: "Leander" }, function() {
-                db2.set({ type: "z", age: 21 }, { name: "Samantha" }, function() {
-                  db1.get({ type: "z" }, function(v) {
-                    assert.deepEqual(v, []);
-                    test.get({ type: "z" }, function(v) {
-                      assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
-                      done();
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    })
-  });
-  describe('#should properly deal with partial cache', function() {
-    it("should miss on partial hits", function (done) {
-      var settings1 = { type: "memory" };
-      var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-1" } };
-      var test = new MultiStore({ cacheOnMiss: true, stores: [settings1, settings2] });
-      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-1" });
-      test.connect(function () {
-        db1.connect(function () {
-          test.del({ type: "z" }, function() {
-            db1.del({ type: "z" }, function() {
-              db1.set({ type: "z", age: 24 }, { name: "Leander" }, function() {
-                db1.set({ type: "z", age: 21 }, { name: "Samantha" }, function() {
-                  // Should miss here
-                  test.get({ type: "z", age: 24 }, function(v) {
-                    assert.deepEqual(v, [{ name: "Leander" }]);
-                    // Should miss again here
-                    test.get({ type: "z" }, function(v) {
-                      assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
-                      // Should hit here
-                      test.get({ type: "z" }, function(v) {
-                        assert.deepEqual(v, [{ name: "Leander" }, { name: "Samantha" }]);
-                        done();
-                      });
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    })
   });
   describe('#call cb once only', function() {
     it("should fetch from the first", function (done) {
@@ -203,5 +90,83 @@ describe('MultiStorage', function(){
         done();
       });
     })
+  });
+  describe('#cache', function() {
+    it("should fetch from cache", function (done) {
+      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-cache" } };
+      var test = new MultiStore({ cache: true, stores: [settings1] });
+      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-cache" });
+      db1.connect(function () {
+        db1.set("x", 21, function() {
+        db1.set("y", 24, function() {
+          db1.get("y", function(v) {
+            assert.deepEqual(v, [24]);
+            test.connect(function () {
+              test.get("x", function (v) {
+                assert.deepEqual(v, [21]);
+                db1.del("x", function() {
+                db1.del("y", function() {
+                  db1.get("x", function (v) {
+                    assert.deepEqual(v, []);
+                    test.get("x", function (v) {
+                      assert.deepEqual(v, [21]);
+                      done();
+                    });
+                  });
+                });
+                });
+              });
+            });
+          });
+        });
+        });
+      })
+    });
+    it("should fetch from multiple cache", function (done) {
+      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-cache-1" } };
+      var settings2 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-cache-2" } };
+      var test = new MultiStore({ cache: true, stores: [settings1, settings2] });
+      var db1 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-cache-1" });
+      var db2 = new MongoStore({ db: "testing", collectionName: "mocha-test-multi-cache-2" });
+      db1.connect(function () {
+      db2.connect(function () {
+        db1.del({ age: 20 }, function() {
+        db2.del({ age: 20 }, function() {
+          db1.set({ age: 20, name: "x" }, { email: "cool@beans.com" }, function() {
+          db2.set({ age: 20, name: "y" }, { email: "mean@beans.com" }, function() {
+            db1.get({ name: "y" }, function(v) {
+              assert.deepEqual(v, []);
+            db1.get({ name: "x" }, function(v) {
+              assert.deepEqual(v, [{ email: "cool@beans.com" }]);
+              db2.get({ name: "y" }, function(v) {
+                assert.deepEqual(v, [{ email: "mean@beans.com" }]);
+              db2.get({ name: "x" }, function(v) {
+                assert.deepEqual(v, []);
+                test.connect(function () {
+                  test.get({ name: "x" }, function (v) {
+                    assert.deepEqual(v, [{ email: "cool@beans.com" }]);
+                  test.get({ name: "y" }, function (v) {
+                    assert.deepEqual(v, [{ email: "mean@beans.com" }]);
+                  test.get({ age: 20 }, function (v) {
+                    assert.ok(v.length == 2);
+                    db1.del({ age: 20 }, function() {
+                    db2.del({ age: 20 }, function() {
+                      test.get({ name: "x" }, function (v) {
+                        assert.deepEqual(v, [{ email: "cool@beans.com" }]);
+                      test.get({ name: "y" }, function (v) {
+                        assert.deepEqual(v, [{ email: "mean@beans.com" }]);
+                      test.get({ age: 20 }, function (v) {
+                        assert.ok(v.length == 2);
+                        done();
+                      })})}); // get test (after delete)
+                    })}); // del
+                  })})}); // get test (on connect)
+                }); // connect
+              })}); // get 2
+            })}); // get 1
+          })}); // set
+        })}); // del
+      })}); // connect
+    });
   });
 });

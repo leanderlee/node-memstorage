@@ -1,4 +1,5 @@
 var MongoStore = require("../lib/mongo");
+var MemoryStore = require("../lib/memory");
 var assert = require("assert");
 
 describe('MongoStorage', function(){
@@ -45,14 +46,16 @@ describe('MongoStorage', function(){
     it("should include key", function (done) {
       var test = new MongoStore({ db: "testing", collectionName: "mocha-test", includeKey: true });
       test.connect(function () {
-        test.set({ first: "Anna", last: "Apple" }, { email: "simple@apple.com" }, function() {
-          test.set({ first: "Samantha", last: "Apple" }, { email: "simple@apple.com" }, function() {
-            test.get({ last: "Apple" }, function (v) {
-              assert.deepEqual(v, [
-                { key: { first: "Anna", last: "Apple" }, val: { email: "simple@apple.com" } },
-                { key: { first: "Samantha", last: "Apple" }, val: { email: "simple@apple.com" } }
-              ]);
-              done();
+        test.del({ last: "Apple" }, function() {
+          test.set({ first: "Anna", last: "Apple" }, { email: "simple@apple.com" }, function() {
+            test.set({ first: "Samantha", last: "Apple" }, { email: "simple@apple.com" }, function() {
+              test.get({ last: "Apple" }, function (v) {
+                assert.deepEqual(v, [
+                  { key: { first: "Anna", last: "Apple" }, val: { email: "simple@apple.com" } },
+                  { key: { first: "Samantha", last: "Apple" }, val: { email: "simple@apple.com" } }
+                ]);
+                done();
+              })
             })
           })
         })
@@ -220,5 +223,38 @@ describe('MongoStorage', function(){
         })
       });
     })
+  });
+  describe('#copy', function() {
+    it("should copy", function (done) {
+      var db1 = new MemoryStore();
+      var db2 = new MongoStore({ db: "testing", collectionName: "mocha-copy-test" });
+      db1.connect(function () {
+      db2.connect(function () {
+        db1.del({ age: 20 }, function() {
+        db2.del({ age: 20 }, function() {
+          db1.get({ age: 20 }, function (v) {
+            assert.deepEqual(v, []);
+            db2.get({ age: 20 }, function (v) {
+              assert.deepEqual(v, []);
+              db2.set({ first: "Anna", age: 20 }, { email: "anna@apple.com" }, function() {
+              db2.set({ first: "Samantha", age: 20 }, { email: "arthur@apple.com" }, function() {
+                db1.get({ age: 20 }, function (v) {
+                  assert.deepEqual(v, []);
+                  db2.copy(db1, function () {
+                    db1.get({ age: 20 }, function (v) {
+                      assert.deepEqual(v, [{ email: "anna@apple.com" }, { email: "arthur@apple.com" }]);
+                      done();
+                    });
+                  });
+                });
+              });
+              });
+            });
+          });
+        });
+        });
+      });
+      });
+    });
   });
 });

@@ -92,6 +92,39 @@ describe('MultiStorage', function(){
     })
   });
   describe('#cache', function() {
+    it("should set to cache", function (done) {
+      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-cache" } };
+      var test = new MultiStore({ cache: true, stores: [settings1] });
+      test.connect(function () {
+        test.del({ x: 5 }, function () {
+          test.set({ x: 5 }, { email: "x@unknown.com" }, function () {
+            test.get({ x: 5 }, function (v) {
+              assert.deepEqual(v, [{ email: "x@unknown.com" }]);
+              done();
+            });
+          })
+        })
+      })
+    })
+    it("should del from cache", function (done) {
+      var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-cache" } };
+      var test = new MultiStore({ cache: true, stores: [settings1] });
+      test.connect(function () {
+        test.del({ x: 5 }, function () {
+          test.set({ x: 5 }, { email: "x@unknown.com" }, function () {
+            test.get({ x: 5 }, function (v) {
+              assert.deepEqual(v, [{ email: "x@unknown.com" }]);
+              test.del({ x: 5 }, function (v) {
+                test.get({ x: 5 }, function (v) {
+                  assert.deepEqual(v, []);
+                  done();
+                })
+              })
+            });
+          })
+        })
+      })
+    })
     it("should fetch from cache", function (done) {
       var settings1 = { type: "mongo", settings: { db: "testing", collectionName: "mocha-test-multi-cache" } };
       var test = new MultiStore({ cache: true, stores: [settings1] });
